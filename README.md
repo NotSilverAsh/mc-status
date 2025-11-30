@@ -4,7 +4,7 @@ A simple Node.js library to fetch **Java Edition** and **Bedrock Edition** Minec
 
 ---
 
-## ⚠️ Warning
+## Warning
 
 This package is still in early development. Bugs and breaking changes may occur. Please report any issues on GitHub.
 
