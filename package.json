@@ -1,0 +1,27 @@
+{
+  "name": "@shorkiedev/mc-status",
+  "version": "1.0.6",
+  "description": "A simple ESM package that can check multiple minecraft server status.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "import": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc"
+  },
+  "keywords": [
+    "minecraft",
+    "server",
+    "java",
+    "bedrock",
+    "latency"
+  ],
+  "author": "Sh4rk7",
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "typescript": "^5.9.3"
+  }
+}
