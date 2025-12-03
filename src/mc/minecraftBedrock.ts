@@ -1,29 +1,13 @@
 /**
  * BEDROCK EDITION SERVER
  */
-import dgram, { RemoteInfo } from "node:dgram";
+import { RemoteInfo, createSocket } from "node:dgram";
 import crypto from "node:crypto";
-import type { BedrockPingOptions, BedrockServerStatus } from "../types/mcTypes.js";
+import type { BedrockPingOptions, BedrockServerStatus, BedrockMotd } from "../types/mcTypes.js";
+import { detectBedrockSoftware } from "../utils/mcParser.js";
 
 const MAGIC = Buffer.from("00ffff00fefefefefdfdfdfd12345678", "hex");
-const START_TIME = Date.now();
 const UNCONNECTED_PONG = 0x1c;
-
-interface BedrockMotd {
-  edition: string;
-  name: string;
-  protocol: number;
-  version: string;
-  playerCount: number;
-  playerMax: number;
-  serverGuid: bigint;
-  subName?: string;
-  gamemode?: string;
-  nintendoLimited?: boolean;
-  port?: number;
-  ipv6Port?: number;
-  editorMode?: boolean;
-}
 
 const createUnconnectedPingFrame = (timestamp: number): Buffer => {
   const buffer = Buffer.alloc(33);
@@ -82,6 +66,8 @@ const motdToServerStatus = (motd: BedrockMotd): BedrockServerStatus => ({
   playersOnline: motd.playerCount,
   playersMax: motd.playerMax,
   version: motd.version,
+  software: detectBedrockSoftware(motd.name) || null,
+  levelName: motd.subName || null,
 });
 
 const parseUnconnectedPong = (pongPacket: Buffer): BedrockServerStatus => {
@@ -110,7 +96,24 @@ export async function getBedrockServer(host: string, options: BedrockPingOptions
   if (cached && now - cached.timestamp < CACHE_TTL) return cached.data;
 
   const attempts: BedrockServerStatus[] = [];
-  for (let i = 0; i < PING_COUNT; i++) attempts.push(await singlePing(host, port, timeout));
+
+  for (let i = 0; i < PING_COUNT; i++) {
+    try {
+      const status = await singlePing(host, port, timeout);
+      attempts.push(status);
+    } catch {
+      attempts.push({
+        online: false,
+        latency: null,
+        motd: null,
+        playersOnline: null,
+        playersMax: null,
+        version: null,
+        software: "Bedrock",
+        levelName: null,
+      });
+    }
+  }
 
   const online = attempts.filter(a => a.online);
   const avgLatency = online.length
@@ -124,9 +127,9 @@ export async function getBedrockServer(host: string, options: BedrockPingOptions
 
 function singlePing(host: string, port: number, timeout: number): Promise<BedrockServerStatus> {
   return new Promise((resolve, reject) => {
-    const socket = dgram.createSocket("udp4");
+    const socket = createSocket("udp4");
     let cleanedUp = false;
-
+    const start = Date.now();
     const cleanup = () => {
       if (cleanedUp) return;
       cleanedUp = true;
@@ -144,7 +147,7 @@ function singlePing(host: string, port: number, timeout: number): Promise<Bedroc
     socket.on("message", (msg: Buffer, rinfo: RemoteInfo) => {
       try {
         const status = parseUnconnectedPong(msg);
-        status.latency = Date.now() - START_TIME;
+        status.latency = Date.now() - start;
         cleanup();
         resolve(status);
       } catch (err) {
@@ -153,14 +156,13 @@ function singlePing(host: string, port: number, timeout: number): Promise<Bedroc
       }
     });
 
-    // start timeout after listeners are attached to avoid an emitted error
     timeoutTask = setTimeout(() => {
       cleanup();
       reject(new Error("Socket timeout"));
     }, timeout);
 
     try {
-      socket.send(createUnconnectedPingFrame(Date.now() - START_TIME), port, host);
+      socket.send(createUnconnectedPingFrame(Date.now() - start), port, host);
     } catch (err) {
       socket.emit("error", err);
     }
