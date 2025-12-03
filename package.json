@@ -1,6 +1,6 @@
 {
   "name": "@shorkiedev/mc-status",
-  "version": "1.0.8",
+  "version": "1.1.0",
   "description": "A simple ESM package that can check multiple minecraft server status.",
   "license": "MIT",
   "type": "module",
