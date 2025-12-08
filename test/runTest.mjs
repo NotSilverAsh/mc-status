@@ -13,7 +13,7 @@ process.on('unhandledRejection', (reason) => {
 import { pingServers, getBedrockServer, getJavaServer } from '../dist/index.js';
 
 const serversList = [
-  { name: 'Java Demo', host: 'demo.mcstatus.io', port: 25565, type: 'java', timeout: 10000 },
+  { name: 'Java Demo', host: 'noel.hidencloud.com', port: 24601, type: 'java', timeout: 10000 },
   { name: 'Bedrock Demo', host: 'demo.mcstatus.io', port: 19132, type: 'bedrock', timeout: 10000 },
 ];
 

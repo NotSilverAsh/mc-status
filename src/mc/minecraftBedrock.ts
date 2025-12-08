@@ -1,10 +1,13 @@
 /**
  * BEDROCK EDITION SERVER
+ * @param host - Hostname or IP (Required)
+ * @param port - Port (Default: 19132, required btw)
+ * @param timeout - Request timeout (default: 5000ms)
  */
 import { RemoteInfo, createSocket } from "node:dgram";
 import crypto from "node:crypto";
 import type { BedrockPingOptions, BedrockServerStatus, BedrockMotd } from "../types/mcTypes.js";
-import { detectBedrockSoftware } from "../utils/mcParser.js";
+import { detectBedrockSoftware } from "../libs/mcParser.js";
 
 const MAGIC = Buffer.from("00ffff00fefefefefdfdfdfd12345678", "hex");
 const UNCONNECTED_PONG = 0x1c;

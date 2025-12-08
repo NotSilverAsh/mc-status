@@ -1,11 +1,14 @@
 /**
  * JAVA EDITION SERVER
+ * @param host - Hostname or IP (Required)
+ * @param port - Port (Default: 25565, required btw)
+ * @param timeout - Request timeout (default: 5000ms)
  */
 import { Socket } from "node:net";
-import { encodeVarInt, decodeVarInt } from "../utils/varInt.js";
+import { encodeVarInt, decodeVarInt } from "../libs/varInt.js";
 import type { JavaServerStatus, JavaPingResponse } from "../types/mcTypes.js";
-import { parseMotd, detectSoftware } from "../utils/mcParser.js";
-import { resolveSRVRecord, queryJavaServer, tcpPing } from "../utils/netUtils.js";
+import { parseMotd, detectSoftware } from "../libs/mcParser.js";
+import { resolveSRVRecord, queryJavaServer, tcpPing } from "../libs/netUtils.js";
 
 const CACHE_TTL = 5000;
 const PING_COUNT = 3;
@@ -181,9 +184,14 @@ export async function getJavaServer(host: string, port = 25565, timeout = 5000):
 
   const final = online[0] ? { ...online[0], latency: avgLatency } : attempts[0];
 
-  const query = await queryJavaServer(host, port).catch(() => ({ levelName: null, plugins: [] }));
-  final.levelName = query.levelName;
-  final.plugins = query.plugins;
+  try {
+    const query = await queryJavaServer(host, port, timeout);
+    final.levelName = query.levelName;
+    final.plugins = query.plugins;
+  } catch (err) {
+    console.error(`[Query Error] ${host}:${port} -`, err instanceof Error ? err.message : String(err));
+    // Keep default empty plugins and null levelName
+  }
 
   cache.set(key, { timestamp: now, data: final });
   return final;

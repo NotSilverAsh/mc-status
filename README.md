@@ -27,24 +27,38 @@ yarn add @shorkiedev/mc-status
 ---
 
 # Usage/Examples
+
 ### Pinging Multiple Servers
 
 ```javascript
-import { pingServers } from '@shorkiedev/mc-status';
+import { pingServers } from "@shorkiedev/mc-status";
 
 const serversList = [
-    { name: "Java Server", host: "demo.mcstatus.io", port: 25565, type: "java", timeout: 10000 },
-    { name: "Bedrock Server", host: "demo.mcstatus.io", port: 19132, type: "bedrock", timeout: 10000 },
+  {
+    name: "Java Server",
+    host: "demo.mcstatus.io",
+    port: 25565,
+    type: "java",
+    timeout: 10000,
+  },
+  {
+    name: "Bedrock Server",
+    host: "demo.mcstatus.io",
+    port: 19132,
+    type: "bedrock",
+    timeout: 10000,
+  },
 ];
 
-(async () => {
-    const pingResult = await pingServers(serversList);
-    console.log("------PING RESULT------");
-    console.log(pingResult);
-});
+async () => {
+  const pingResult = await pingServers(serversList);
+  console.log("------PING RESULT------");
+  console.log(pingResult);
+};
 ```
 
 ### Expected Output:
+
 ```json
 {
   "multiServerPing": [
@@ -52,64 +66,63 @@ const serversList = [
       "name": "Java Demo",
       "type": "java",
       "online": true,
-      "latency": 783,
+      "latency": 265,
       "motd": "    §red;;; §red>§gold>§yellow> §whiteMinecraft Server Status §yellow<§gold<§red< §red;;;\n             §goldhttps://mcstatus.io/",
       "playersOnline": 71,
       "playersMax": 100,
-      "version": "1.20.1"
+      "version": "1.20.1",
+      "software": "Vanilla",
+      "plugins": [],
+      "levelName": null
     },
     {
       "name": "Bedrock Demo",
       "type": "bedrock",
       "online": true,
-      "latency": 537,
+      "latency": 267,
       "motd": "A Bedrock server",
-      "playersOnline": 62,
+      "playersOnline": 50,
       "playersMax": 100,
-      "version": "1.19.70"
+      "version": "1.19.70",
+      "software": "Bedrock",
+      "levelName": "You cannot connect!"
     }
-  ],
-  "singleJavaPing": {
-    "online": true,
-    "latency": 783,
-    "motd": "    §red;;; §red>§gold>§yellow> §whiteMinecraft Server Status §yellow<§gold<§red< §red;;;\n             §goldhttps://mcstatus.io/",
-    "playersOnline": 71,
-    "playersMax": 100,
-    "version": "1.20.1"
-  },
-  "singleBedrockPing": {
-    "online": true,
-    "latency": 537,
-    "motd": "A Bedrock server",
-    "playersOnline": 62,
-    "playersMax": 100,
-    "version": "1.19.70"
-  }
+  ]
 }
 ```
 
 ### Pinging A Single Java Server
 
 ```javascript
-import { getJavaServer } from '@shorkiedev/mc-status';
+import { getJavaServer } from "@shorkiedev/mc-status";
 
-(async () => {
-    const singlePingResult = await getJavaServer("demo.mcstatus.io", 25565, 10000);
+async () => {
+  const singlePingResult = await getJavaServer(
+    "demo.mcstatus.io",
+    25565,
+    10000
+  );
 
-    console.log("------SINGLE JAVA PING RESULT------");
-    console.log(singlePingResult);
-});
+  console.log("------SINGLE JAVA PING RESULT------");
+  console.log(singlePingResult);
+};
 ```
 
 ### Expected Output:
+
 ```json
 {
-  "online": true,
-  "latency": 783,
-  "motd": "    §red;;; §red>§gold>§yellow> §whiteMinecraft Server Status §yellow<§gold<§red< §red;;;\n             §goldhttps://mcstatus.io/",
-  "playersOnline": 71,
-  "playersMax": 100,
-  "version": "1.20.1"
+  "singleJavaPing": {
+    "online": true,
+    "latency": 262,
+    "motd": "    §red;;; §red>§gold>§yellow> §whiteMinecraft Server Status §yellow<§gold<§red< §red;;;\n             §goldhttps://mcstatus.io/",
+    "playersOnline": 71,
+    "playersMax": 100,
+    "version": "1.20.1",
+    "software": "Vanilla",
+    "plugins": [],
+    "levelName": null
+  }
 }
 ```
 
@@ -118,24 +131,32 @@ import { getJavaServer } from '@shorkiedev/mc-status';
 ### Pinging A Single Bedrock Server
 
 ```javascript
-import { getBedrockServer } from '@shorkiedev/mc-status';
+import { getBedrockServer } from "@shorkiedev/mc-status";
 
-(async () => {
-    const singlePingResult = await getBedrockServer("demo.mcstatus.io", { port: 19132, timeout: 10000 });
+async () => {
+  const singlePingResult = await getBedrockServer("demo.mcstatus.io", {
+    port: 19132,
+    timeout: 10000,
+  });
 
-    console.log("------SINGLE BEDROCK PING RESULT------");
-    console.log(singlePingResult);
-});
+  console.log("------SINGLE BEDROCK PING RESULT------");
+  console.log(singlePingResult);
+};
 ```
 
 ### Expected Output:
+
 ```json
 {
-  "online": true,
-  "latency": 537,
-  "motd": "A Bedrock server",
-  "playersOnline": 62,
-  "playersMax": 100,
-  "version": "1.19.70"
+  "singleBedrockPing": {
+    "online": true,
+    "latency": 267,
+    "motd": "A Bedrock server",
+    "playersOnline": 75,
+    "playersMax": 100,
+    "version": "1.19.70",
+    "software": "Bedrock",
+    "levelName": "You cannot connect!"
+  }
 }
 ```
